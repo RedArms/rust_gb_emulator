@@ -367,9 +367,15 @@ impl CPU{
 
                 println!("hey") 
             },
-            0x40 => { 
 
-                println!("hey") 
+           
+            //	8bit load/store/move instructions
+
+            
+            //B register
+            0x40 => { 
+                //LD B,B
+                self.b = self.b;
             },
             0x41 => {
                 //LD B,C
@@ -378,7 +384,6 @@ impl CPU{
             0x42 => {
                 //LD B,D
                 self.b = self.d;     
- 
             },
             0x43 => { 
                 //LD B,E
@@ -394,15 +399,17 @@ impl CPU{
             },
             0x46 => { 
                 // How to cast H(0xF) with L(0xE) TO HL(0xFE) 
-
                 // h = 0xF (as u16) => 0x0F (<<4) => 0xF0 (+0x0E) => 0XFE
-                let p:u16 = ((self.h as u16) << 4) + self.l as u16;
-                self.b = self.read(p as usize);
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.b = self.read(hl as usize);
              },
             0x47 => { 
                 //LD B,A
                 self.b = self.a; 
             },
+
+
+            //C register
             0x48 => { 
                 //LD C,B
                 self.c = self.b;
@@ -428,206 +435,234 @@ impl CPU{
                 self.c = self.l; 
             },
             0x4E => { 
-
-                let p:u16 = ((self.h as u16) << 4) + self.l as u16;
-                self.c = self.read(p as usize); 
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.c = self.read(hl as usize); 
             },
             0x4F => { 
-
-                println!("hey") 
+                 //LD C,A
+                 self.c = self.a; 
             },
-            0x50 => { 
 
-                println!("hey") 
+
+            //D register
+            0x50 => { 
+                //LD D,B
+                self.d = self.b; 
             },
             0x51 => { 
-
-                println!("hey") 
+                //LD D,C
+                self.d = self.c; 
             },
             0x52 => { 
-
-                println!("hey") 
+                //LD D,D
+                self.d = self.d;               
             },
             0x53 => { 
-
-                println!("hey") 
+                //LD D,E
+                self.d = self.e; 
             },
             0x54 => { 
-
-                println!("hey") 
+                //LD D,H
+                self.d = self.h;               
             },
             0x55 => { 
-
-                println!("hey") 
+                //LD D,L
+                self.d = self.l;               
             },
             0x56 => { 
-
-                println!("hey") 
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.d = self.read(hl as usize); 
             },
             0x57 => { 
-
-                println!("hey") 
+                //LD D,A
+                self.d = self.a;               
             },
-            0x58 => { 
 
-                println!("hey") 
+
+            //E register
+            0x58 => { 
+                //LD E,B
+                self.e = self.b;               
             },
             0x59 => { 
-
-                println!("hey") 
+                //LD E,C
+                self.e = self.c;               
             },
             0x5A => { 
-
-                println!("hey") 
+                //LD E,D
+                self.e = self.d;               
             },
             0x5B => { 
-
-                println!("hey") 
+                //LD E,E
+                self.e = self.e;               
             },
             0x5C => { 
-
-                println!("hey") 
+                //LD E,H
+                self.e = self.h;               
             },
             0x5D => { 
-
-                println!("hey") 
+                //LD E,L
+                self.e = self.l;               
             },
             0x5E => { 
-
-                println!("hey") 
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.e = self.read(hl as usize); 
             },
             0x5F => { 
-
-                println!("hey") 
+                //LD E,A
+                self.e = self.a;               
             },
-            0x60 => { 
 
-                println!("hey") 
+
+            //H register
+            0x60 => { 
+                //LD H,B
+                self.h = self.b;               
             },
             0x61 => { 
-
-                println!("hey") 
+                //LD H,C
+                self.h = self.c;               
             },
             0x62 => { 
-
-                println!("hey") 
+                //LD H,D
+                self.h = self.d;               
             },
             0x63 => { 
-
-                println!("hey") 
+                //LD H,A
+                self.h = self.e;               
             },
             0x64 => { 
-
-                println!("hey") 
+                //LD H,A
+                self.h = self.h;               
             },
             0x65 => { 
-
-                println!("hey") 
+                //LD H,A
+                self.h = self.l;               
             },
             0x66 => { 
-
-                println!("hey") 
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.h = self.read(hl as usize); 
             },
             0x67 => { 
-
-                println!("hey") 
+                //LD H,A
+                self.h = self.a;               
             },
-            0x68 => { 
 
-                println!("hey") 
+
+            //L register
+            0x68 => { 
+                //LD L,B
+                self.l = self.b;               
             },
             0x69 => { 
-
-                println!("hey") 
+                //LD L,C
+                self.l = self.c;               
             },
             0x6A => { 
-
-                println!("hey") 
+                //LD L,D
+                self.l = self.d;               
             },
             0x6B => { 
-
-                println!("hey") 
+                //LD L,E
+                self.l = self.e;               
             },
             0x6C => { 
-
-                println!("hey") 
+                //LD L,H
+                self.l = self.h;               
             },
             0x6D => { 
-
-                println!("hey") 
+                //LD L,L
+                self.l = self.l;               
             },
             0x6E => { 
-
-                println!("hey") 
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.l = self.read(hl as usize); 
             },
             0x6F => { 
-
-                println!("hey") 
+                //LD L,A
+                self.l = self.a;               
             },
-            0x70 => { 
 
-                println!("hey") 
+
+            //HL register
+            0x70 => {  
+                //LD (HL),B
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.write(hl as usize, self.b);
             },
             0x71 => { 
-
-                println!("hey") 
+                //LD (HL),C
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.write(hl as usize, self.c);
             },
             0x72 => { 
-
-                println!("hey") 
+                //LD (HL),D
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.write(hl as usize, self.d);
             },
             0x73 => { 
-
-                println!("hey") 
+                //LD (HL),E
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.write(hl as usize, self.e);
             },
             0x74 => { 
-
-                println!("hey") 
+                //LD (HL),H
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.write(hl as usize, self.h);
             },
             0x75 => { 
-
-                println!("hey") 
+                //LD (HL),L
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.write(hl as usize, self.l);
             },
             0x76 => { 
-
-                println!("hey") 
+                //HALT
+                //STOP clock               
             },
             0x77 => { 
-
-                println!("hey") 
+                //LD (HL),A
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.write(hl as usize, self.a);
             },
-            0x78 => { 
 
-                println!("hey") 
+
+            //A register
+            0x78 => { 
+                //LD A,B
+                self.a = self.b;               
             },
             0x79 => { 
-
-                println!("hey") 
+                //LD A,C
+                self.a = self.c;               
             },
             0x7A => { 
-
-                println!("hey") 
+                //LD A,C
+                self.a = self.d;               
             },
             0x7B => { 
-
-                println!("hey") 
+                //LD A,E
+                self.a = self.e;               
             },
             0x7C => { 
-
-                println!("hey") 
+                //LD A,H
+                self.a = self.h;               
             },
             0x7D => { 
-
-                println!("hey") 
+                //LD A,L
+                self.a = self.l;               
             },
             0x7E => { 
-
-                println!("hey") 
+                let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
+                self.a = self.read(hl as usize); 
             },
             0x7F => { 
-
-                println!("hey") 
+                //LD A,A
+                self.a = self.a;               
             },
+
+
+
+            //
             0x80 => { 
 
                 println!("hey") 
