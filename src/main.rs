@@ -113,13 +113,17 @@ impl CPU{
         let opcode = self.read(self.pc as usize);
         match opcode{
             0x00=>{
-                let x = self.a;
-                print!("its {x} \n");        
-                let x = (self.a as u16)<<4;
-                print!("get a return {:#06x} \n",x)
                 //NOP
             },
             0x01=>{
+                //LD BC,d16(nn)
+
+                let nn:u16 = Self::cast_xy(self.read((self.pc+1) as usize),self.read((self.pc+2) as usize));
+                // ex: want to cast NN (0xFE) to BC
+                // B = NN>>4 (0XFE>>4 = 0xF)
+                // C = (NN<<4) as u8)>>4  (0XFE<<4 = 0XFE0) as u8 => 0xE0 >>4 = 0xE
+                self.b = (nn>>4) as u8;
+                self.c = ((nn<<4) as u8)>>4;
                 println!("hey")
             },    
             0x02 => {
@@ -131,6 +135,20 @@ impl CPU{
                 println!("hey") 
             },
             0x04 => { 
+                
+                //INC B
+                match self.b.checked_add(1) {
+                    Some(v) => {
+                        self.b = v;
+                    }
+                    None => {
+                        self.b = 0x00;
+                        self.nf = false;
+                        self.hf = true;
+                        self.zf = true;
+                    }
+                };
+
 
                 println!("hey") 
             },
@@ -1200,13 +1218,19 @@ impl CPU{
 fn main() {
     let mut cpu:CPU = CPU::init();
 
-    cpu.set_a(0x1);
+    let x:u8 = 0xff;
 
-    cpu.get_a();
 
-    cpu.execute();
-    cpu.get_a();
+    match x.checked_add(1) {
+        Some(v) => {
+            println!("{:#01x}", v);
+        }
+        None => {
+            println!("overflow!");
+        }
+    };
 
-    let x = (0x00ff<<8) + 0xee; //0x0ff (255) (0000 1111 1111) << 1 = 0x01fe (510) (0001 1111 1110)
+    println!("{:#01x}", x);
+
 
 }
