@@ -370,8 +370,11 @@ impl CPU{
 
            
             //	8bit load/store/move instructions
+            // How to cast H(0xF) with L(0xE) TO HL(0xFE) 
+            // h = 0xF (as u16) => 0x0F (<<4) => 0xF0 (+0x0E) => 0XFE
+            // impl : let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
 
-            
+
             //B register
             0x40 => { 
                 //LD B,B
@@ -398,8 +401,7 @@ impl CPU{
                 self.b = self.l; 
             },
             0x46 => { 
-                // How to cast H(0xF) with L(0xE) TO HL(0xFE) 
-                // h = 0xF (as u16) => 0x0F (<<4) => 0xF0 (+0x0E) => 0XFE
+                //LD B,(HL)
                 let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
                 self.b = self.read(hl as usize);
              },
@@ -435,6 +437,7 @@ impl CPU{
                 self.c = self.l; 
             },
             0x4E => { 
+                //LD C,(HL)
                 let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
                 self.c = self.read(hl as usize); 
             },
@@ -470,6 +473,7 @@ impl CPU{
                 self.d = self.l;               
             },
             0x56 => { 
+                //LD D,(HL)
                 let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
                 self.d = self.read(hl as usize); 
             },
@@ -504,7 +508,8 @@ impl CPU{
                 //LD E,L
                 self.e = self.l;               
             },
-            0x5E => { 
+            0x5E => {
+                //LD E,(HL)
                 let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
                 self.e = self.read(hl as usize); 
             },
@@ -539,7 +544,8 @@ impl CPU{
                 //LD H,A
                 self.h = self.l;               
             },
-            0x66 => { 
+            0x66 => {
+                //LD H,(HL)
                 let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
                 self.h = self.read(hl as usize); 
             },
@@ -574,7 +580,8 @@ impl CPU{
                 //LD L,L
                 self.l = self.l;               
             },
-            0x6E => { 
+            0x6E => {
+                //LD L,(HL)
                 let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
                 self.l = self.read(hl as usize); 
             },
@@ -651,7 +658,8 @@ impl CPU{
                 //LD A,L
                 self.a = self.l;               
             },
-            0x7E => { 
+            0x7E => {
+                //LD A,(HL)
                 let hl:u16 = ((self.h as u16) << 4) + self.l as u16;
                 self.a = self.read(hl as usize); 
             },
