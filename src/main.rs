@@ -109,7 +109,8 @@ impl CPU{
         self.ram[pointeur] = value;
     }
 
-    fn execute(&mut self,opcode: u8){
+    fn execute(&mut self){
+        let opcode = self.read(self.pc as usize);
         match opcode{
             0x00=>{
                 let x = self.a;
@@ -122,7 +123,9 @@ impl CPU{
                 println!("hey")
             },    
             0x02 => {
-                 println!("hey") 
+                //LD (BC),A
+                let bc:u16 = ((self.b as u16) << 4) + self.c as u16;
+                self.write(bc as usize,self.a);
                 },
             0x03 => { 
                 println!("hey") 
@@ -184,8 +187,9 @@ impl CPU{
                 println!("hey") 
             },
             0x12 => { 
-
-                println!("hey") 
+                //LD (DE),A
+                let de:u16 = ((self.d as u16) << 4) + self.e as u16;
+                self.write(de as usize,self.a);
             },
             0x13 => { 
 
@@ -248,8 +252,9 @@ impl CPU{
                 println!("hey") 
             },
             0x22 => { 
-
-                println!("hey") 
+                //LD (HL++),A
+                let hl:u16 = ((self.h as u16) << 4) + (self.l as u16) + 1;
+                self.write(hl as usize,self.a);
             },
             0x23 => { 
 
@@ -312,8 +317,9 @@ impl CPU{
                 println!("hey") 
             },
             0x32 => { 
-
-                println!("hey") 
+                //LD (HL--),A
+                let hl:u16 = ((self.h as u16) << 4) + (self.l as u16) - 1;
+                self.write(hl as usize,self.a);
             },
             0x33 => { 
 
@@ -1198,7 +1204,7 @@ fn main() {
 
     cpu.get_a();
 
-    cpu.execute(0x00);
+    cpu.execute();
     cpu.get_a();
 
     let x = (0x00ff<<8) + 0xee; //0x0ff (255) (0000 1111 1111) << 1 = 0x01fe (510) (0001 1111 1110)
