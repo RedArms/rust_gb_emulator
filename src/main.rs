@@ -45,12 +45,6 @@ struct CPU{
     sp:u16, //Stack Pointer 
     pc:u16, //Program Counter
 
-    //flags
-    zf:bool,
-    nf:bool,
-    hf:bool,
-    cf:bool,
-
     //ram
     ram:[u8;0xFFFF]
 }
@@ -71,13 +65,10 @@ impl CPU{
             //pointers
             sp:0x00, //Stack Pointer 
             pc:0x00, //Program Counter
-        
-            //flags
-            zf:false, //0x0
-            nf:false,
-            hf:false,
-            cf:false,
-        
+    
+            //7 	6 	5 	4 	3 	2 	1 	0
+            //Z 	N 	H 	C 	0 	0 	0 	0
+            
             //ram
             ram:[0;0xFFFF] 
         };
@@ -143,14 +134,12 @@ impl CPU{
                     }
                     None => {
                         self.b = 0x00;
-                        self.nf = false;
-                        self.hf = true;
-                        self.zf = true;
+                        self.f += 0b1000_0000; //Z up
+                        self.f += 0b0000_0000; //N down
+                        self.f += 0b0010_0000; //H up
                     }
                 };
 
-
-                println!("hey") 
             },
             0x05 => { 
 
@@ -696,6 +685,19 @@ impl CPU{
 
             //
             0x80 => { 
+
+                match self.a.checked_add(self.b) {
+                    Some(v) => {
+                        self.a = v;
+                    }
+                    None => {
+                        self.b = 0x00;
+                        self.f += 0b1000_0000; //Z up
+                        self.f += 0b0000_0000; //N down
+                        self.f += 0b0010_0000; //H up
+
+                    }
+                };
 
                 println!("hey") 
             },
