@@ -84,6 +84,23 @@ impl CPU{
         return self.a;
     }
 
+    fn halfcarry(checked:u8,add:u8) -> bool{
+
+        let low4bit = (checked & 0b0000_1111) + (add & 0b0000_1111);
+        return low4bit & 0b1111_0000 != 0;
+    }
+
+    fn carry(checked:u8,add:u8) -> bool{
+        match checked.checked_add(add){
+            Some(v) =>{
+                return false;
+            }
+            None => {
+                return true;
+            }
+        }
+    }
+
     fn cast_xy(x_: u8,_y:u8) -> u16{
         return ((x_ as u16) << 4) + _y as u16;
     }
@@ -98,6 +115,11 @@ impl CPU{
 
     fn write(&mut self,pointeur: usize,value: u8){
         self.ram[pointeur] = value;
+    }
+
+    fn get_HL(&mut self) -> u8{
+        let hl:u16 = ((self.h as u16) << 4) + (self.l as u16);
+        return self.read(hl as usize);
     }
 
     fn execute(&mut self){
@@ -128,6 +150,13 @@ impl CPU{
             0x04 => { 
                 
                 //INC B
+
+                self.f += 0b0000_0000; //N down
+                
+                if Self::halfcarry(self.b, 1) {
+                    self.f = self.f |0b0010_0000; //H up
+                }
+ 
                 match self.b.checked_add(1) {
                     Some(v) => {
                         self.b = v;
@@ -135,8 +164,6 @@ impl CPU{
                     None => {
                         self.b = 0x00;
                         self.f += 0b1000_0000; //Z up
-                        self.f += 0b0000_0000; //N down
-                        self.f += 0b0010_0000; //H up
                     }
                 };
 
@@ -683,56 +710,199 @@ impl CPU{
 
 
 
-            //
+            //ADD
             0x80 => { 
+                //ADD A,B
 
+                self.f = self.f & 0b1011_1111; //N down => AND to 0b1110_1111 so N gonna down
+
+                if Self::halfcarry(self.a, self.b) {
+                    self.f = self.f |0b0010_0000; //H up
+                }
+                
                 match self.a.checked_add(self.b) {
                     Some(v) => {
                         self.a = v;
                     }
                     None => {
-                        self.b = 0x00;
-                        self.f += 0b1000_0000; //Z up
-                        self.f += 0b0000_0000; //N down
-                        self.f += 0b0010_0000; //H up
+                        self.a = 0x00;
+                        self.f = self.f |0b1000_0000; //Z up
+                        self.f = self.f |0b0001_0000; //C up
+
+                    }
+                };
+            },
+            0x81 => { 
+                //ADD A,C
+
+                self.f = self.f & 0b1011_1111; //N down => AND to 0b1110_1111 so N gonna down
+
+                if Self::halfcarry(self.a, self.c) {
+                    self.f = self.f |0b0010_0000; //H up
+                }
+                
+                match self.a.checked_add(self.c) {
+                    Some(v) => {
+                        self.a = v;
+                    }
+                    None => {
+                        self.a = 0x00;
+                        self.f = self.f |0b1000_0000; //Z up
+                        self.f = self.f |0b0001_0000; //C up
+
+                    }
+                };
+            },
+            0x82 => {                
+                //ADD A,D
+
+                self.f = self.f & 0b1011_1111; //N down => AND to 0b1110_1111 so N gonna down
+
+                if Self::halfcarry(self.a, 1) {
+                    self.f = self.f |0b0010_0000; //H up
+                }
+                
+                match self.a.checked_add(self.d) {
+                    Some(v) => {
+                        self.a = v;
+                    }
+                    None => {
+                        self.a = 0x00;
+                        self.f = self.f |0b1000_0000; //Z up
+                        self.f = self.f |0b0001_0000; //C up
+
+                    }
+                };
+            },
+            0x83 => { 
+                //ADD A,E
+
+                self.f = self.f & 0b1011_1111; //N down => AND to 0b1110_1111 so N gonna down
+
+                if Self::halfcarry(self.a, 1) {
+                    self.f = self.f |0b0010_0000; //H up
+                }
+                
+                match self.a.checked_add(self.e) {
+                    Some(v) => {
+                        self.a = v;
+                    }
+                    None => {
+                        self.a = 0x00;
+                        self.f = self.f |0b1000_0000; //Z up
+                        self.f = self.f |0b0001_0000; //C up
+
+                    }
+                };
+            },
+            0x84 => { 
+                //ADD A,H
+
+                self.f = self.f & 0b1011_1111; //N down => AND to 0b1110_1111 so N gonna down
+
+                if Self::halfcarry(self.a, 1) {
+                    self.f = self.f |0b0010_0000; //H up
+                }
+                
+                match self.a.checked_add(self.h) {
+                    Some(v) => {
+                        self.a = v;
+                    }
+                    None => {
+                        self.a = 0x00;
+                        self.f = self.f |0b1000_0000; //Z up
+                        self.f = self.f |0b0001_0000; //C up
+
+                    }
+                };
+            },
+            0x85 => { 
+                //ADD A,L
+
+                self.f = self.f & 0b1011_1111; //N down => AND to 0b1110_1111 so N gonna down
+
+                if Self::halfcarry(self.a, 1) {
+                    self.f = self.f |0b0010_0000; //H up
+                }
+                
+                match self.a.checked_add(self.l) {
+                    Some(v) => {
+                        self.a = v;
+                    }
+                    None => {
+                        self.a = 0x00;
+                        self.f = self.f |0b1000_0000; //Z up
+                        self.f = self.f |0b0001_0000; //C up
+
+                    }
+                };
+                        
+            },
+            0x86 => { 
+                //ADD A,(HL)
+
+                self.f = self.f & 0b1011_1111; //N down => AND to 0b1110_1111 so N gonna down
+
+                let hl:u8 = self.read((((self.h as u16) << 4) + self.l as u16) as usize);
+
+                if Self::halfcarry(self.a, hl) {
+                    self.f = self.f |0b0010_0000; //H up
+                }
+                
+                match self.a.checked_add(hl) {
+                    Some(v) => {
+                        self.a = v;
+                    }
+                    None => {
+                        self.a = 0x00;
+                        self.f = self.f |0b1000_0000; //Z up
+                        self.f = self.f |0b0001_0000; //C up
 
                     }
                 };
 
-                println!("hey") 
             },
-            0x81 => { 
+            0x87 => {                 
+                //ADD A,A
 
-                println!("hey") 
-            },
-            0x82 => { 
+                self.f = self.f & 0b1011_1111; //N down => AND to 0b1110_1111 so N gonna down
 
-                println!("hey") 
-            },
-            0x83 => { 
+                if Self::halfcarry(self.a, self.a) {
+                    self.f = self.f |0b0010_0000; //H up
+                }
+                
+                match self.a.checked_add(self.a) {
+                    Some(v) => {
+                        self.a = v;
+                    }
+                    None => {
+                        self.a = 0x00;
+                        self.f = self.f |0b1000_0000; //Z up
+                        self.f = self.f |0b0001_0000; //C up
 
-                println!("hey") 
-            },
-            0x84 => { 
-
-                println!("hey") 
-            },
-            0x85 => { 
-
-                println!("hey") 
-            },
-            0x86 => { 
-
-                println!("hey") 
-            },
-            0x87 => { 
-
-                println!("hey") 
+                    }
+                };
             },
             0x88 => { 
+                //ADC A,B
 
-                println!("hey") 
-            },
+                self.f = self.f & 0b1011_1111; //N down => AND to 0b1110_1111 so N gonna down
+
+                if Self::halfcarry(self.a, self.a) {
+                    self.f = self.f |0b0010_0000; //H up
+                }
+                
+                match self.a.checked_add(self.b + (self.f & 0b0001_0000)) {
+                    Some(v) => {
+                        self.a = v;
+                    }
+                    None => {
+                        self.a = 0x00;
+                        self.f = self.f |0b1000_0000; //Z up
+                        self.f = self.f |0b0001_0000; //C up
+
+                    }
+                };            },
             0x89 => { 
 
                 println!("hey") 
@@ -1220,19 +1390,22 @@ impl CPU{
 fn main() {
     let mut cpu:CPU = CPU::init();
 
-    let x:u8 = 0xff;
+    let x:u8 = 0b1100_0010;
 
+    let y = (x>>4) & 1;
 
-    match x.checked_add(1) {
-        Some(v) => {
-            println!("{:#01x}", v);
-        }
-        None => {
-            println!("overflow!");
-        }
-    };
-
-    println!("{:#01x}", x);
+    // NOT
+    // how to "disable" a bite from byte XOR OR 
+    //0010_1001
+    //  |
+    //  v
+    //  => (0) => (0) (1) => (0)
+    // AND 1110_1111
+    // 
+    if y==1 {
+        print!("ok");
+    }
+    println!("{:#010b}", x & y);
 
 
 }
