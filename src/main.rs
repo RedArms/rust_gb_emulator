@@ -84,6 +84,20 @@ impl CPU{
         return self.a;
     }
 
+    fn print_reg(&mut self){
+
+        print!("Registers\n
+        A:{:#04x} F:{:#04x} \n
+        B:{:#04x} C:{:#04x} \n
+        D:{:#04x} E:{:#04x} \n
+        H:{:#04x} L:{:#04x} \n",
+        self.a,self.f,
+        self.b,self.c,
+        self.d,self.e,
+        self.h,self.l)
+
+    }
+
     fn halfcarry(checked:u8,add:u8) -> bool{
 
         let low4bit = (checked & 0b0000_1111) + (add & 0b0000_1111);
@@ -124,6 +138,7 @@ impl CPU{
 
     fn execute(&mut self){
         let opcode = self.read(self.pc as usize);
+        self.pc +=1;
         match opcode{
             0x00=>{
                 //NOP
@@ -1390,22 +1405,23 @@ impl CPU{
 fn main() {
     let mut cpu:CPU = CPU::init();
 
-    let x:u8 = 0b1100_0010;
+    cpu.print_reg();
+    cpu.write(0x00, 0x04);
+    cpu.write(0x01, 0x04);
+    cpu.write(0x02, 0x60);
 
-    let y = (x>>4) & 1;
+    cpu.execute();
+    cpu.print_reg();
 
-    // NOT
-    // how to "disable" a bite from byte XOR OR 
-    //0010_1001
-    //  |
-    //  v
-    //  => (0) => (0) (1) => (0)
-    // AND 1110_1111
-    // 
-    if y==1 {
-        print!("ok");
-    }
-    println!("{:#010b}", x & y);
+    
+    cpu.execute();
+    cpu.print_reg();
+
+    cpu.execute();
+    cpu.print_reg();
+
+
+
 
 
 }
