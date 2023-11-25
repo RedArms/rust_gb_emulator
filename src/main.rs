@@ -1,5 +1,6 @@
 // u8 => 0000 0000 => 1 byte
 
+
 /*
 Start	End	Description	Notes
 0000	3FFF	16 KiB ROM bank 00	From cartridge, usually a fixed bank
@@ -166,7 +167,7 @@ impl CPU{
                 
                 //INC B
 
-                self.f += 0b0000_0000; //N down
+                self.f = self.f & 0b1011_1111; //N down => AND to 0b1110_1111 so N gonna down
                 
                 if Self::halfcarry(self.b, 1) {
                     self.f = self.f |0b0010_0000; //H up
@@ -178,14 +179,27 @@ impl CPU{
                     }
                     None => {
                         self.b = 0x00;
-                        self.f += 0b1000_0000; //Z up
+                        self.f = self.f |0b1000_0000; //Z up
                     }
                 };
 
             },
+
+            // TO DO : CHECK ADD SUB OF EXCEPTION 
             0x05 => { 
 
-                println!("hey") 
+                //DEC B
+                self.f = self.f | 0b0100_0000; //N UP 
+
+                match self.b.checked_sub(1) {
+                    Some(v) => {
+                        self.b = v;
+                    }
+                    None => {
+                        self.b = 0x00;
+                        self.f += 0b1000_0000; //Z up
+                    }
+                };            
             },
             0x06 => { 
 
@@ -1183,6 +1197,7 @@ impl CPU{
                 println!("hey") 
             },
             0xCB => { 
+                // ALL CB operators finito pipo
 
                 println!("hey") 
             },
@@ -1405,10 +1420,20 @@ impl CPU{
 fn main() {
     let mut cpu:CPU = CPU::init();
 
+    let mut x:u8 = 0b0000_0000;
+
+    x -= 1;
+
+    print!("{x}");
+    
     cpu.print_reg();
     cpu.write(0x00, 0x04);
     cpu.write(0x01, 0x04);
     cpu.write(0x02, 0x60);
+    cpu.write(0x03, 0x78);
+    cpu.write(0x04, 0x80);
+
+
 
     cpu.execute();
     cpu.print_reg();
@@ -1420,8 +1445,12 @@ fn main() {
     cpu.execute();
     cpu.print_reg();
 
+    cpu.execute();
+    cpu.print_reg();
 
 
+    cpu.execute();
+    cpu.print_reg();
 
 
 }
