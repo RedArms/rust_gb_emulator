@@ -2412,16 +2412,7 @@ fn main() {
     let mut x:u8 = 0b1010_0000; //0b0101_0101 0b1010_1010
 
 
-    print!("{:#02x}\n", x);
-    print!("{:#02x}\n", y);
-    
-
-    print!("{:#02x}\n", x);
-    print!("{:#02x}\n", y);
-
-
-
-    
+ 
     cpu.print_reg();
     cpu.write(0x00, 0x04);//write slot 1 of ram 0x04 opcode => INC B
     cpu.write(0x01, 0x04);//=> INC B
