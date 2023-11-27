@@ -85,6 +85,96 @@ impl CPU{
         return self.a;
     }
 
+    fn up_z(&mut self){
+        self.f = self.f | 0b1000_0000;
+    }
+    fn up_n(&mut self){
+        self.f = self.f | 0b0100_0000;
+    }
+    fn up_h(&mut self){
+        self.f = self.f | 0b0010_0000;
+    }
+    fn up_c(&mut self){
+        self.f = self.f | 0b0001_0000;
+    }
+
+    fn down_z(&mut self){
+        self.f = self.f & 0b0111_1111;
+    }
+    fn down_n(&mut self){
+        self.f = self.f & 0b1011_1111;
+    }
+    fn down_h(&mut self){
+        self.f = self.f & 0b1101_1111;
+    }
+    fn down_c(&mut self){
+        self.f = self.f & 0b1110_1111;
+    }
+
+
+
+    fn rlc(&mut self,x:u8) -> u8{
+        if (x & 0b1000_0000) == 0b1000_0000 {
+            return (x<<1) + 1;
+        } else {
+            return x<<1;
+        }
+    }
+
+    fn rrc(&mut self,x:u8) -> u8{
+        if (x & 0b0000_0001) == 0b0000_0001 {
+            return (x>>1) + 0b1000_0000;
+        } else {
+            return x>>1;
+        }
+    }
+
+    fn rl(&mut self,x:u8) -> u8{
+        let mut c = 0; 
+
+        if self.f & 0b0001_0000 == 0b0001_0000 {
+            c = 1;
+        }
+
+        if (x & 0b1000_0000) == 0b1000_0000 {
+            self.f = self.f | 0b0001_0000;
+        }
+
+        return (x<<1) + c;
+    }
+
+    fn rr(&mut self,x:u8) -> u8{
+        let mut c = 0; 
+
+        if self.f & 0b0001_0000 == 0b0001_0000 {
+            c = 0b1000_0000;
+        }
+
+        if (x & 0b0000_0001) == 0b0000_0001 {
+            self.f = self.f | 0b0001_0000;
+        }
+        return (x>>1) + c ;
+
+    }
+
+    fn sll(&mut self,x:u8) -> u8{
+        if (x & 0b1000_0000) == 0b1000_0000 {
+            self.f = self.f | 0b0001_0000;
+        }
+
+        return (x<<1) + 1;
+    }
+
+    fn srl(&mut self,x:u8) -> u8{
+        if (x & 0b0000_0001) == 0b0000_0001 {
+            self.f = self.f | 0b0001_0000;
+        }
+        return (x>>1) + 0b1000_0000 ;
+
+    }
+
+    
+
     fn print_reg(&mut self){
 
         print!("Registers\n
@@ -135,6 +225,903 @@ impl CPU{
     fn get_HL(&mut self) -> u8{
         let hl:u16 = ((self.h as u16) << 4) + (self.l as u16);
         return self.read(hl as usize);
+    }
+
+    fn execute_CB(&mut self){
+        let opcode = self.read(self.pc as usize);
+        self.pc +=1;
+        match opcode{
+            0x00=>{
+                //RLC B
+                self.b = self.rlc(self.b);
+            },
+            0x01=>{
+                //RLC C
+                self.c = self.rlc(self.c);
+            },    
+            0x02 => {
+                //RLC D
+                self.d = self.rlc(self.d);
+                
+                },
+            0x03 => { 
+                //RLC E
+                self.e = self.rlc(self.e);
+            },
+            0x04 => {
+                //RLC H
+                self.h = self.rlc(self.h);
+   
+            },
+            0x05 => {
+                //RLC L
+                self.l = self.rlc(self.l);
+            },
+            0x06 => { 
+                //RLC (HL)
+                //TODO
+
+            },
+            0x07 => { 
+                //RLC A
+                self.a = self.rlc(self.a);
+
+            },
+            0x08 => { 
+                //RRC B
+                self.b = self.rrc(self.b);
+            },
+            0x09 => { 
+                //RRC C
+                self.c = self.rrc(self.c);
+                 
+            },
+            0x0A => { 
+                //RRC D
+                self.d = self.rrc(self.d);
+            },
+            0x0B => { 
+                //RRC E
+                self.e = self.rrc(self.e);
+
+            },
+            0x0C => { 
+                //RRC H
+                self.h = self.rrc(self.h);
+
+            },
+            0x0D => { 
+                //RRC L
+                self.l = self.rrc(self.l);
+
+            },
+            0x0E => { 
+                //RRC (HL)
+                //todo
+            },
+            0x0F => { 
+                //RRC A
+                self.a = self.rrc(self.a);
+            },
+            0x10 => {
+                //RL B
+                self.b = self.rl(self.b);
+            },
+            0x11 => { 
+                //RL C
+                self.c = self.rl(self.c);
+            },
+            0x12 => {
+                //RL D
+                self.d = self.rl(self.d); 
+            },
+            0x13 => {                 
+                //RL E
+                self.e = self.rl(self.e);
+            },
+            0x14 => {                 
+                //RL H
+                self.h = self.rl(self.h);
+            },
+            0x15 => {                
+                //RL L
+                self.l = self.rl(self.l);
+            },
+            0x16 => { 
+                //RL (HL)
+                //TO DO
+            },
+            0x17 => { 
+                //RL A
+                self.a = self.rl(self.a); 
+            },
+            0x18 => { 
+                //RR B
+                self.b = self.rr(self.b); 
+            },
+            0x19 => { 
+                //RR C
+                self.c = self.rr(self.c); 
+            },
+            0x1A => { 
+                //RR D
+                self.d = self.rr(self.d); 
+            },
+            0x1B => { 
+                //RR E
+                self.e = self.rr(self.e); 
+            },
+            0x1C => { 
+                //RR H
+                self.h = self.rr(self.h); 
+            },
+            0x1D => { 
+                //RR L
+                self.l = self.rr(self.l); 
+            },
+            0x1E => { 
+                //RR (HL)
+                //todo
+            },
+            0x1F => { 
+                //RR A
+                self.a = self.rr(self.a); 
+            },
+            0x20 => { 
+
+                println!("hey") 
+            },
+            0x21 => { 
+
+                println!("hey") 
+            },
+            0x22 => { 
+            },
+            0x23 => { 
+
+                println!("hey") 
+            },
+            0x24 => { 
+
+                println!("hey") 
+            },
+            0x25 => { 
+
+                println!("hey") 
+            },
+            0x26 => { 
+
+                println!("hey") 
+            },
+            0x27 => { 
+
+                println!("hey") 
+            },
+            0x28 => { 
+
+                println!("hey") 
+            },
+            0x29 => { 
+
+                println!("hey") 
+            },
+            0x2A => { 
+
+                println!("hey") 
+            },
+            0x2B => { 
+
+                println!("hey") 
+            },
+            0x2C => { 
+
+                println!("hey") 
+            },
+            0x2D => { 
+
+                println!("hey") 
+            },
+            0x2E => { 
+
+                println!("hey") 
+            },
+            0x2F => { 
+
+                println!("hey") 
+            },
+            0x30 => { 
+
+                println!("hey") 
+            },
+            0x31 => { 
+
+                println!("hey") 
+            },
+            0x32 => { 
+            },
+            0x33 => { 
+
+                println!("hey") 
+            },
+            0x34 => { 
+
+                println!("hey") 
+            },
+            0x35 => { 
+
+                println!("hey") 
+            },
+            0x36 => { 
+
+                println!("hey") 
+            },
+            0x37 => { 
+
+                println!("hey") 
+            },
+            0x38 => { 
+
+                println!("hey") 
+            },
+            0x39 => { 
+
+                println!("hey") 
+            },
+            0x3A => { 
+
+                println!("hey") 
+            },
+            0x3B => { 
+
+                println!("hey") 
+            },
+            0x3C => { 
+
+                println!("hey") 
+            },
+            0x3D => { 
+
+                println!("hey") 
+            },
+            0x3E => { 
+
+                println!("hey") 
+            },
+            0x3F => { 
+
+                println!("hey") 
+            },
+
+           
+            0x40 => { 
+            },
+            0x41 => {
+            },
+            0x42 => {
+            },
+            0x43 => { 
+            },
+            0x44 => { 
+             },
+            0x45 => { 
+            },
+            0x46 => { 
+             },
+            0x47 => { 
+            },
+
+            0x48 => { 
+             },
+            0x49 => { 
+             },
+            0x4A => { 
+             },
+            0x4B => { 
+            },
+            0x4C => { 
+            },
+            0x4D => { 
+            },
+            0x4E => { 
+            },
+            0x4F => { 
+            },
+            0x50 => { 
+            },
+            0x51 => { 
+            },
+            0x52 => { 
+            },
+            0x53 => { 
+            },
+            0x54 => { 
+            },
+            0x55 => { 
+            },
+            0x56 => { 
+            },
+            0x57 => { 
+            },
+
+            0x58 => { 
+            },
+            0x59 => { 
+            },
+            0x5A => { 
+            },
+            0x5B => { 
+            },
+            0x5C => { 
+            },
+            0x5D => { 
+            },
+            0x5E => {
+            },
+            0x5F => { 
+            },
+            0x60 => { 
+            },
+            0x61 => { 
+            },
+            0x62 => { 
+            },
+            0x63 => { 
+            },
+            0x64 => { 
+            },
+            0x65 => { 
+            },
+            0x66 => {
+            },
+            0x67 => { 
+            },
+            0x68 => { 
+            },
+            0x69 => { 
+            },
+            0x6A => { 
+            },
+            0x6B => { 
+            },
+            0x6C => { 
+            },
+            0x6D => { 
+            },
+            0x6E => {
+            },
+            0x6F => { 
+            },
+            0x70 => {  
+            },
+            0x71 => { 
+            },
+            0x72 => { 
+            },
+            0x73 => { 
+            },
+            0x74 => { 
+            },
+            0x75 => { 
+            },
+            0x76 => { 
+            },
+            0x77 => { 
+            },
+            0x78 => { 
+            },
+            0x79 => { 
+            },
+            0x7A => { 
+            },
+            0x7B => { 
+            },
+            0x7C => { 
+            },
+            0x7D => { 
+            },
+            0x7E => {
+            },
+            0x7F => { 
+            },
+            0x80 => { 
+            },
+            0x81 => { 
+            },
+            0x82 => {                
+            },
+            0x83 => { 
+            },
+            0x84 => { 
+            },
+            0x85 => {                         
+            },
+            0x86 => { 
+
+            },
+            0x87 => {                 
+            },
+            0x88 => { 
+            },
+            0x89 => { 
+
+                println!("hey") 
+            },
+            0x8A => { 
+
+                println!("hey") 
+            },
+            0x8B => { 
+
+                println!("hey") 
+            },
+            0x8C => { 
+
+                println!("hey") 
+            },
+            0x8D => { 
+
+                println!("hey") 
+            },
+            0x8E => { 
+
+                println!("hey") 
+            },
+            0x8F => { 
+
+                println!("hey") 
+            },
+            0x90 => { 
+
+                println!("hey") 
+            },
+            0x91 => { 
+
+                println!("hey") 
+            },
+            0x92 => { 
+
+                println!("hey") 
+            },
+            0x93 => { 
+
+                println!("hey") 
+            },
+            0x94 => { 
+
+                println!("hey") 
+            },
+            0x95 => { 
+
+                println!("hey") 
+            },
+            0x96 => { 
+
+                println!("hey") 
+            },
+            0x97 => { 
+
+                println!("hey") 
+            },
+            0x98 => { 
+
+                println!("hey") 
+            },
+            0x99 => { 
+
+                println!("hey") 
+            },
+            0x9A => { 
+
+                println!("hey") 
+            },
+            0x9B => { 
+
+                println!("hey") 
+            },
+            0x9C => { 
+
+                println!("hey") 
+            },
+            0x9D => { 
+
+                println!("hey") 
+            },
+            0x9E => { 
+
+                println!("hey") 
+            },
+            0x9F => { 
+
+                println!("hey") 
+            },
+            0xA0 => { 
+
+                println!("hey") 
+            },
+            0xA1 => { 
+
+                println!("hey") 
+            },
+            0xA2 => { 
+
+                println!("hey") 
+            },
+            0xA3 => { 
+
+                println!("hey") 
+            },
+            0xA4 => { 
+
+                println!("hey") 
+            },
+            0xA5 => { 
+
+                println!("hey") 
+            },
+            0xA6 => { 
+
+                println!("hey") 
+            },
+            0xA7 => { 
+
+                println!("hey") 
+            },
+            0xA8 => { 
+
+                println!("hey") 
+            },
+            0xA9 => { 
+
+                println!("hey") 
+            },
+            0xAA => { 
+
+                println!("hey") 
+            },
+            0xAB => { 
+
+                println!("hey") 
+            },
+            0xAC => { 
+
+                println!("hey") 
+            },
+            0xAD => { 
+
+                println!("hey") 
+            },
+            0xAE => { 
+
+                println!("hey") 
+            },
+            0xAF => { 
+
+                println!("hey") 
+            },
+            0xB0 => { 
+
+                println!("hey") 
+            },
+            0xB1 => { 
+
+                println!("hey") 
+            },
+            0xB2 => { 
+
+                println!("hey") 
+            },
+            0xB3 => { 
+
+                println!("hey") 
+            },
+            0xB4 => { 
+
+                println!("hey") 
+            },
+            0xB5 => { 
+
+                println!("hey") 
+            },
+            0xB6 => { 
+
+                println!("hey") 
+            },
+            0xB7 => { 
+
+                println!("hey") 
+            },
+            0xB8 => { 
+
+                println!("hey") 
+            },
+            0xB9 => { 
+
+                println!("hey") 
+            },
+            0xBA => { 
+
+                println!("hey") 
+            },
+            0xBB => { 
+
+                println!("hey") 
+            },
+            0xBC => { 
+
+                println!("hey") 
+            },
+            0xBD => { 
+
+                println!("hey") 
+            },
+            0xBE => { 
+
+                println!("hey") 
+            },
+            0xBF => { 
+
+                println!("hey") 
+            },
+            0xC0 => { 
+
+                println!("hey") 
+            },
+            0xC1 => { 
+
+                println!("hey") 
+            },
+            0xC2 => { 
+
+                println!("hey") 
+            },
+            0xC3 => { 
+
+                println!("hey") 
+            },
+            0xC4 => { 
+
+                println!("hey") 
+            },
+            0xC5 => { 
+
+                println!("hey") 
+            },
+            0xC6 => { 
+
+                println!("hey") 
+            },
+            0xC7 => { 
+
+                println!("hey") 
+            },
+            0xC8 => { 
+
+                println!("hey") 
+            },
+            0xC9 => { 
+
+                println!("hey") 
+            },
+            0xCA => { 
+
+                println!("hey") 
+            },
+            0xCB => { 
+            },
+            0xCC => { 
+
+                println!("hey") 
+            },
+            0xCD => { 
+
+                println!("hey") 
+            },
+            0xCE => { 
+
+                println!("hey") 
+            },
+            0xCF => { 
+
+                println!("hey") 
+            },
+            0xD0 => { 
+
+                println!("hey") 
+            },
+            0xD1 => { 
+
+                println!("hey") 
+            },
+            0xD2 => { 
+
+                println!("hey") 
+            },
+            0xD3 => { 
+
+                println!("hey") 
+            },
+            0xD4 => { 
+
+                println!("hey") 
+            },
+            0xD5 => { 
+
+                println!("hey") 
+            },
+            0xD6 => { 
+
+                println!("hey") 
+            },
+            0xD7 => { 
+
+                println!("hey") 
+            },
+            0xD8 => { 
+
+                println!("hey") 
+            },
+            0xD9 => { 
+
+                println!("hey") 
+            },
+            0xDA => { 
+
+                println!("hey") 
+            },
+            0xDB => { 
+
+                println!("hey") 
+            },
+            0xDC => { 
+
+                println!("hey") 
+            },
+            0xDD => { 
+
+                println!("hey") 
+            },
+            0xDE => { 
+
+                println!("hey") 
+            },
+            0xDF => { 
+
+                println!("hey") 
+            },
+            0xE0 => { 
+
+                println!("hey") 
+            },
+            0xE1 => { 
+
+                println!("hey") 
+            },
+            0xE2 => { 
+
+                println!("hey") 
+            },
+            0xE3 => { 
+
+                println!("hey") 
+            },
+            0xE4 => { 
+
+                println!("hey") 
+            },
+            0xE5 => { 
+
+                println!("hey") 
+            },
+            0xE6 => { 
+
+                println!("hey") 
+            },
+            0xE7 => { 
+
+                println!("hey") 
+            },
+            0xE8 => { 
+
+                println!("hey") 
+            },
+            0xE9 => { 
+
+                println!("hey") 
+            },
+            0xEA => { 
+
+                println!("hey") 
+            },
+            0xEB => { 
+
+                println!("hey") 
+            },
+            0xEC => { 
+
+                println!("hey") 
+            },
+            0xED => { 
+
+                println!("hey") 
+            },
+            0xEE => { 
+
+                println!("hey") 
+            },
+            0xEF => { 
+
+                println!("hey") 
+            },
+            0xF0 => { 
+
+                println!("hey") 
+            },
+            0xF1 => { 
+
+                println!("hey") 
+            },
+            0xF2 => { 
+
+                println!("hey") 
+            },
+            0xF3 => { 
+
+                println!("hey") 
+            },
+            0xF4 => { 
+
+                println!("hey") 
+            },
+            0xF5 => { 
+
+                println!("hey") 
+            },
+            0xF6 => { 
+
+                println!("hey") 
+            },
+            0xF7 => { 
+
+                println!("hey") 
+            },
+            0xF8 => { 
+
+                println!("hey") 
+            },
+            0xF9 => { 
+
+                println!("hey") 
+            },
+            0xFA => { 
+
+                println!("hey") 
+            },
+            0xFB => { 
+
+                println!("hey") 
+            },
+            0xFC => { 
+
+                println!("hey") 
+            },
+            0xFD => { 
+
+                println!("hey") 
+            },
+            0xFE => { 
+
+                println!("hey") 
+            },
+            0xFF => { 
+
+                println!("hey") 
+            },
+            _=>{
+
+            }
+        }
+
+
     }
 
     fn execute(&mut self){
@@ -742,7 +1729,7 @@ impl CPU{
             //ADD
             0x80 => { 
                 //ADD A,B
-
+                
                 self.f = self.f & 0b1011_1111; //N down => AND to 0b1110_1111 so N gonna down
 
                 if Self::halfcarry(self.a, self.b) {
@@ -1198,8 +2185,7 @@ impl CPU{
             },
             0xCB => { 
                 // ALL CB operators finito pipo
-
-                println!("hey") 
+                self.execute_CB();
             },
             0xCC => { 
 
@@ -1418,20 +2404,30 @@ impl CPU{
 
 
 fn main() {
+
+
+
     let mut cpu:CPU = CPU::init();
 
-    let mut x:u8 = 0b0000_0000;
+    let mut x:u8 = 0b1010_0000; //0b0101_0101 0b1010_1010
 
-    x -= 1;
 
-    print!("{x}");
+    print!("{:#02x}\n", x);
+    print!("{:#02x}\n", y);
+    
+
+    print!("{:#02x}\n", x);
+    print!("{:#02x}\n", y);
+
+
+
     
     cpu.print_reg();
-    cpu.write(0x00, 0x04);
-    cpu.write(0x01, 0x04);
-    cpu.write(0x02, 0x60);
-    cpu.write(0x03, 0x78);
-    cpu.write(0x04, 0x80);
+    cpu.write(0x00, 0x04);//write slot 1 of ram 0x04 opcode => INC B
+    cpu.write(0x01, 0x04);//=> INC B
+    cpu.write(0x02, 0x60);//=> LD H,B
+    cpu.write(0x03, 0x78);//=> LD A,B
+    cpu.write(0x04, 0x80);//=> ADD B
 
 
 
