@@ -248,10 +248,31 @@ impl CPU{
         self.ram[pointeur] = value;
     }
 
-    fn get_HL(&mut self) -> u8{
+    fn get_HLadr(&mut self) -> u8{
         let hl:u16 = ((self.h as u16) << 4) + (self.l as u16);
         return self.read(hl as usize);
     }
+
+    fn get_BC(&mut self) -> u16{
+        let hl:u16 = ((self.b as u16) << 4) + (self.c as u16);
+        return hl;
+    }
+    fn get_DE(&mut self) -> u16{
+        let hl:u16 = ((self.d as u16) << 4) + (self.e as u16);
+        return hl;
+    }
+
+    fn get_HL(&mut self) -> u16{
+        let hl:u16 = ((self.h as u16) << 4) + (self.l as u16);
+        return hl;
+    }
+
+    fn get_AF(&mut self) -> u16{
+        let hl:u16 = ((self.a as u16) << 4) + (self.f as u16);
+        return hl;
+    }
+
+
 
     fn execute_CB(&mut self){
         let opcode = self.read(self.pc as usize);
@@ -1167,8 +1188,9 @@ impl CPU{
                 };            
             },
             0x06 => { 
-
-                println!("hey") 
+                //LD B,d8
+                self.pc +=1;
+                self.b = self.read(self.pc as usize);
             },
             0x07 => { 
 
@@ -1199,8 +1221,9 @@ impl CPU{
                 println!("hey") 
             },
             0x0E => { 
-
-                println!("hey") 
+                //LD C,d8
+                self.pc +=1;
+                self.c = self.read(self.pc as usize);
             },
             0x0F => { 
 
@@ -1232,8 +1255,9 @@ impl CPU{
                 println!("hey") 
             },
             0x16 => { 
-
-                println!("hey") 
+                //LD D,d8
+                self.pc +=1;
+                self.d = self.read(self.pc as usize);
             },
             0x17 => { 
 
@@ -1264,8 +1288,9 @@ impl CPU{
                 println!("hey") 
             },
             0x1E => { 
-
-                println!("hey") 
+                //LD E,d8
+                self.pc +=1;
+                self.e = self.read(self.pc as usize);
             },
             0x1F => { 
 
@@ -1297,8 +1322,9 @@ impl CPU{
                 println!("hey") 
             },
             0x26 => { 
-
-                println!("hey") 
+                //LD H,d8
+                self.pc +=1;
+                self.h = self.read(self.pc as usize);
             },
             0x27 => { 
 
@@ -1329,8 +1355,9 @@ impl CPU{
                 println!("hey") 
             },
             0x2E => { 
-
-                println!("hey") 
+                //LD L,d8
+                self.pc +=1;
+                self.l = self.read(self.pc as usize);
             },
             0x2F => { 
 
@@ -1366,8 +1393,10 @@ impl CPU{
                 println!("hey") 
             },
             0x37 => { 
-
-                println!("hey") 
+                //SCF
+                self.down_n();
+                self.down_h();
+                self.up_c();
             },
             0x38 => { 
 
@@ -1394,8 +1423,9 @@ impl CPU{
                 println!("hey") 
             },
             0x3E => { 
-
-                println!("hey") 
+                //LD A,d8
+                self.pc +=1;
+                self.a = self.read(self.pc as usize);
             },
             0x3F => { 
 
@@ -2452,8 +2482,9 @@ impl CPU{
                 println!("hey") 
             },
             0xE9 => { 
+                //JP HL
+                self.pc = self.get_HL();
 
-                println!("hey") 
             },
             0xEA => { 
 
