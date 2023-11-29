@@ -735,100 +735,224 @@ impl CPU{
                 println!("hey") 
             },
             0xA0 => { 
-
-                println!("hey") 
+                //AND B
+                self.a = self.a & self.b;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.up_h();
             },
             0xA1 => { 
-
-                println!("hey") 
+                //AND C
+                self.a = self.a & self.c;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.up_h();
             },
             0xA2 => { 
-
-                println!("hey") 
+                //AND D
+                self.a = self.a & self.d;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.up_h();
             },
             0xA3 => { 
-
-                println!("hey") 
+                //AND E
+                self.a = self.a & self.e;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.up_h();
             },
             0xA4 => { 
-
-                println!("hey") 
+                //AND H
+                self.a = self.a & self.h;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.up_h();
             },
             0xA5 => { 
-
-                println!("hey") 
+                //AND L
+                self.a = self.a & self.l;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.up_h();
             },
             0xA6 => { 
-
+                //AND (HL)
                 println!("hey") 
             },
             0xA7 => { 
-
-                println!("hey") 
+                //AND A
+                self.a = self.a & self.a;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.up_h();
             },
             0xA8 => { 
-
-                println!("hey") 
+                //XOR B
+                self.a = self.a ^ self.b;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xA9 => { 
-
-                println!("hey") 
+                //XOR C
+                self.a = self.a ^ self.c;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xAA => { 
-
-                println!("hey") 
+                //XOR D
+                self.a = self.a ^ self.d;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xAB => { 
-
-                println!("hey") 
+                //XOR E
+                self.a = self.a ^ self.e;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xAC => { 
-
-                println!("hey") 
+                //XOR H
+                self.a = self.a ^ self.h;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xAD => { 
-
-                println!("hey") 
+                //XOR L
+                self.a = self.a ^ self.l;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xAE => { 
-
-                println!("hey") 
+                //XOR (HL)
             },
             0xAF => { 
-
-                println!("hey") 
+                //XOR A
+                self.a = self.a ^ self.a;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xB0 => { 
-
-                println!("hey") 
+                //OR B
+                self.a = self.a | self.b;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xB1 => { 
-
-                println!("hey") 
+                //OR C
+                self.a = self.a | self.c;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xB2 => { 
-
-                println!("hey") 
+                //OR D
+                self.a = self.a | self.d;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xB3 => { 
-
-                println!("hey") 
+                //OR E
+                self.a = self.a | self.e;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xB4 => { 
-
-                println!("hey") 
+                //OR H
+                self.a = self.a | self.h;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xB5 => { 
-
-                println!("hey") 
+                //OR L
+                self.a = self.a | self.l;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xB6 => { 
-
-                println!("hey") 
+                //OR (HL)
             },
             0xB7 => { 
-
-                println!("hey") 
+                //OR A
+                self.a = self.a | self.a;
+                if self.a == 0 {
+                    self.up_z()
+                }
+                self.down_c();
+                self.down_n();
+                self.down_h();
             },
             0xB8 => { 
 
